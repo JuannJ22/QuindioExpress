@@ -5,14 +5,14 @@ import java.io.Serializable;
 public class Paquete implements Comparable<Paquete>{
     String codigo;
     Double peso;
-    String municipio;
+    String destino;
     int prioridad;
     int tiempoEstimado;
 
     public Paquete(String codigo, Double peso, String destino, int prioridad, int tiempoEstimado) {
         this.codigo = codigo;
         this.peso = peso;
-        this.municipio = destino;
+        this.destino = destino;
         this.prioridad = prioridad;
         this.tiempoEstimado = tiempoEstimado;
     }
@@ -42,12 +42,12 @@ public class Paquete implements Comparable<Paquete>{
         this.peso = peso;
     }
 
-    public String getMunicipio() {
-        return municipio;
+    public String getDestino() {
+        return destino;
     }
 
-    public void setMunicipio(String municipio) {
-        this.municipio = municipio;
+    public void setDestino(String destino) {
+        this.destino = destino;
     }
 
     public int getPrioridad() {

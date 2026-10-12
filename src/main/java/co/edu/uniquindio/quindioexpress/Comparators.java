@@ -36,6 +36,6 @@ public class Comparators {
         }
     }
 
-    public Comparator<Paquete> DESPACHO =
+    public static final Comparator<Paquete> DESPACHO =
             PRIORIDAD.thenComparing(TIEMPO).thenComparing(Comparator.naturalOrder());
 }
