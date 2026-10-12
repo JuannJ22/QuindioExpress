@@ -69,7 +69,7 @@ public class QuindioExpress {
             return null;
         }
 
-        if (asignaciones.containsKey(repartidor.getIdentificacion())){
+        if (asignaciones.containsValue(repartidor)){
             throw new IllegalStateException("El repartidor tiene un paquetes asignados");
         }
         return repartidores.remove(identificacion);
@@ -116,30 +116,47 @@ public class QuindioExpress {
         return colaPaquete.size();
     }
 
-    public void asignarPaquete(String codigoPaquete, String idRepartidor ) {
+    public void asignarPaquete(String codigoPaquete, String idRepartidor) {
         Paquete paquete = buscarPaquete(codigoPaquete);
-        Repartidor repartidor = repartidores.get(idRepartidor);
+        Repartidor repartidor = buscarRepartidor(idRepartidor);
 
-        if( repartidor == null || paquete == null) throw new IllegalArgumentException("No existe.");
+        if (repartidor == null) {
+            throw new IllegalArgumentException("El repartidor no existe");
+        }
 
-        if (!repartidor.isDisponible()) throw new IllegalArgumentException("El repartidor no esta disponible");
+        if (!colaPaquete.contains(paquete)) {
+            throw new IllegalStateException("El paquete ya fue asignado");
+        }
 
-        if(!repartidor.getZona().equalsIgnoreCase(paquete.getDestino())) throw new IllegalArgumentException("La zona no coincide con el destino");
+        if (!repartidor.isDisponible()) {
+            throw new IllegalStateException("El repartidor no esta disponible");
+        }
+
+        if (!repartidor.getZona().equalsIgnoreCase(paquete.getDestino())) {
+            throw new IllegalArgumentException("La zona no coincide con el destino");
+        }
 
         repartidor.marcarOcupado();
-        asignaciones.put(repartidor.getIdentificacion(), repartidor);
+        asignaciones.put(codigoPaquete, repartidor);
+
+        colaPaquete.remove(paquete);
+        colaPrioridad.remove(paquete);
     }
+
 
     public void RegistrarEntrega(String codigoPaquete) {
         Paquete paquete = buscarPaquete(codigoPaquete);
-        Repartidor repartidor = asignaciones.remove(codigoPaquete);
+        Repartidor repartidor = asignaciones.get(codigoPaquete);
+
+        if (repartidor == null) {
+            throw new IllegalStateException("El paquete no tiene una asignación activa");
+        }
 
         historial.agregarElemento(paquete);
-
-        if (repartidor != null) {
-            repartidor.marcarDisponible();
-        }
+        asignaciones.remove(codigoPaquete);
+        repartidor.marcarDisponible();
     }
+
 
     public double pesoTotalMunicipio(String municipio) {
         return Recursividad.pesoTotal(registro, municipio);
