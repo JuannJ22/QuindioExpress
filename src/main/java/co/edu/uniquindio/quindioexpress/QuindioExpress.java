@@ -2,9 +2,6 @@ package co.edu.uniquindio.quindioexpress;
 
 import co.edu.uniquindio.quindioexpress.Estructuras.ColeccionPropia;
 import co.edu.uniquindio.quindioexpress.Estructuras.ListaEnlazadaPropia;
-import co.edu.uniquindio.quindioexpress.algoritmos.Binaria;
-import co.edu.uniquindio.quindioexpress.algoritmos.DivideYVenceras;
-import co.edu.uniquindio.quindioexpress.algoritmos.Recursividad;
 
 import java.util.*;
 
@@ -137,28 +134,5 @@ public class QuindioExpress {
         if (repartidor != null) {
             repartidor.marcarDisponible();
         }
-    }
-
-    public double pesoTotalMunicipio(String municipio) {
-        return Recursividad.pesoTotal(registro, municipio);
-    }
-
-    public int contarConPrioridadMinima(int minima) {
-        return Recursividad.contarPrioridad(registro, minima);
-    }
-
-    public Paquete buscarBinario(String codigo) {
-        List<Paquete> ordenada = new ArrayList<>(registro);
-        Collections.sort(ordenada);
-        int pos = Binaria.buscar(ordenada, codigo);
-        if (pos == -1) {
-            return null;
-        } else {
-            return ordenada.get(pos);
-        }
-    }
-
-    public Paquete paqueteMasPesado() {
-        return DivideYVenceras.masPesado(registro);
     }
 }
