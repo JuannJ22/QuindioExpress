@@ -12,7 +12,7 @@ public class Recursividad {
         return pesoTotal(lista, municipio, 0);
     }
 
-    public static double pesoTotal(List<Paquete> lista, String municipio, int i) {
+    private static double pesoTotal(List<Paquete> lista, String municipio, int i) {
         if (i == lista.size()) return 0.0;
 
         double actual;
@@ -29,10 +29,9 @@ public class Recursividad {
         return contarPrioridad(lista, minima, 0);
     }
 
-    public static int contarPrioridad(List<Paquete> lista, int minima, int i) {
+    private static int contarPrioridad(List<Paquete> lista, int minima, int i) {
         if (i == lista.size()) return 0;
         int cuenta = lista.get(i).getPrioridad() >= minima ? 1 : 0;
         return cuenta + contarPrioridad(lista, minima, i + 1);
     }
 }
-

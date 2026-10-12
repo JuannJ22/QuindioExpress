@@ -35,7 +35,7 @@ public class QuindioExpress {
 
     public void agregarPaquete(Paquete paquete) {
         if (porCodigo.containsKey(paquete.getCodigo())) {
-            throw new IllegalArgumentException("Ya existe un paquete con ese codigo" + paquete.getCodigo());
+            throw new IllegalArgumentException("Ya existe un paquete con ese codigo: " + paquete.getCodigo());
         }
         registro.add(paquete);
         porCodigo.put(paquete.getCodigo(), paquete);
@@ -44,17 +44,20 @@ public class QuindioExpress {
         porMunicipio.computeIfAbsent(paquete.getDestino(), Llave -> new ArrayList<>()).add(paquete);
     }
 
-    public Paquete buscarPaquete(String codigo) {
-        Paquete paquete = porCodigo.get(codigo);
-        if (paquete == null) throw new IllegalArgumentException("No existe un paquete con ese codigo" + codigo);
-        return porCodigo.get(codigo);
+    public boolean existePaquete(String codigo) {
+        return porCodigo.containsKey(codigo);
     }
 
-    //CRUD REPARTIDOR
+    public Paquete buscarPaquete(String codigo) {
+        Paquete paquete = porCodigo.get(codigo);
+        if (paquete == null) throw new IllegalArgumentException("No existe un paquete con ese codigo: " + codigo);
+        return paquete;
+    }
+
 
     public void agregarRepartidor(Repartidor repartidor) {
         if(repartidores.containsKey(repartidor.getIdentificacion())){
-            throw new IllegalArgumentException("Ya existe una repartidor con esta identificación" + repartidor.getIdentificacion());
+            throw new IllegalArgumentException("Ya existe un repartidor con esta identificación: " + repartidor.getIdentificacion());
         }
         repartidores.put(repartidor.getIdentificacion(), repartidor);
     }
@@ -70,15 +73,15 @@ public class QuindioExpress {
         }
 
         if (asignaciones.containsValue(repartidor)){
-            throw new IllegalStateException("El repartidor tiene un paquetes asignados");
+            throw new IllegalStateException("El repartidor tiene paquetes asignados");
         }
         return repartidores.remove(identificacion);
     }
 
-    //CRUD Municipios
 
-    public Set<String> municipios() {
-        Set<String> municipios = new HashSet<>();
+
+    public HashSet<String> municipios() {
+        HashSet<String> municipios = new HashSet<>();
         for (Paquete paquete : registro) municipios.add(paquete.getDestino());
         return municipios;
     }
@@ -98,14 +101,37 @@ public class QuindioExpress {
     }
 
 
-    //CONSULTAS DE LAS COLAS
-
     public Paquete siguientePorPrioridad() {
         return colaPrioridad.peek();
     }
 
     public Paquete siguienteOrdenLlegada() {
         return colaPaquete.peek();
+    }
+
+
+    public List<Paquete> ordenLlegadaPendientes() {
+        return new ArrayList<>(colaPaquete);
+    }
+
+
+    public List<Paquete> ordenDespachoPendientes() {
+        PriorityQueue<Paquete> copia = new PriorityQueue<>(colaPrioridad);
+        List<Paquete> orden = new ArrayList<>();
+        while (!copia.isEmpty()) orden.add(copia.poll());
+        return orden;
+    }
+
+    public Paquete despacharSiguientePrioritario() {
+        Paquete siguiente = colaPrioridad.peek();
+        if (siguiente == null) return null;
+        for (Repartidor repar : repartidores.values()) {
+            if (repar.isDisponible() && repar.getZona().equalsIgnoreCase(siguiente.getDestino())) {
+                asignarPaquete(siguiente.getCodigo(), repar.getIdentificacion());
+                return siguiente;
+            }
+        }
+        throw new IllegalStateException("No hay repartidor disponible en " + siguiente.getDestino());
     }
 
     public boolean hayPendientes(){
@@ -144,7 +170,7 @@ public class QuindioExpress {
     }
 
 
-    public void RegistrarEntrega(String codigoPaquete) {
+    public void registrarEntrega(String codigoPaquete) {
         Paquete paquete = buscarPaquete(codigoPaquete);
         Repartidor repartidor = asignaciones.get(codigoPaquete);
 
@@ -157,6 +183,15 @@ public class QuindioExpress {
         repartidor.marcarDisponible();
     }
 
+
+
+    public Iterable<Paquete> getHistorial() {
+        return historial;
+    }
+
+    public int cantidadEntregados() {
+        return historial.tamanio();
+    }
 
     public double pesoTotalMunicipio(String municipio) {
         return Recursividad.pesoTotal(registro, municipio);
