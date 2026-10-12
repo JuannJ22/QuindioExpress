@@ -45,6 +45,8 @@ public class QuindioExpress {
     }
 
     public Paquete buscarPaquete(String codigo) {
+        Paquete paquete = porCodigo.get(codigo);
+        if (paquete == null) throw new IllegalArgumentException("No existe un paquete con ese codigo" + codigo);
         return porCodigo.get(codigo);
     }
 
@@ -98,11 +100,11 @@ public class QuindioExpress {
 
     //CONSULTAS DE LAS COLAS
 
-    public Paquete siguientePorPrioridad(Paquete paquete) {
+    public Paquete siguientePorPrioridad() {
         return colaPrioridad.peek();
     }
 
-    public Paquete siguienteOrdenLlegada(Paquete paquete) {
+    public Paquete siguienteOrdenLlegada() {
         return colaPaquete.peek();
     }
 
